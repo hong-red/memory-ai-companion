@@ -1,0 +1,47 @@
+{
+  "name": "ai-companion-framework",
+  "version": "1.0.0",
+  "description": "A comprehensive AI companion framework with multi-modal interactions and customizable roles",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "serve": "python -m http.server 8080",
+    "dev": "python -m http.server 8080 --bind 127.0.0.1",
+    "build": "echo 'No build process needed for static files'",
+    "deploy": "echo 'Ready for deployment to static hosting'"
+  },
+  "keywords": [
+    "ai",
+    "companion",
+    "chatbot",
+    "multimodal",
+    "voice",
+    "image",
+    "memory",
+    "moonshot",
+    "kimi"
+  ],
+  "author": "AI Companion Framework Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/ai-companion-framework.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/ai-companion-framework/issues"
+  },
+  "homepage": "https://github.com/your-username/ai-companion-framework#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "devDependencies": {},
+  "dependencies": {},
+  "files": [
+    "*.html",
+    "*.css",
+    "*.js",
+    "js/",
+    "README.md",
+    "LICENSE"
+  ]
+}
