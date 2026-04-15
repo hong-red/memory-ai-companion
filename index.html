@@ -2060,9 +2060,9 @@
           }
         });
 
-        voiceBtn.addEventListener('click', () => {
+        voiceBtn.onclick = () => {
           this.toggleVoiceRecording(voiceBtn);
-        });
+        };
       }
 
       // 切换语音录制状态
@@ -2099,7 +2099,7 @@
           const voiceBtn = document.getElementById('voice-btn');
           if (voiceBtn) {
             voiceBtn.classList.remove('recording');
-            voiceBtn.textContent = '语音';
+            voiceBtn.textContent = '♪';
           }
         }
       }
