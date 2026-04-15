@@ -951,7 +951,7 @@
       constructor() {
         this.currentTab = 'home';
         this.currentRole = null;
-        this.chatHistory = JSON.parse(localStorage.getItem('chat_history') || '[]');
+        this.chatHistory = []; // 将在loadRoleChatHistory中加载
         this.diaries = JSON.parse(localStorage.getItem('diaries') || '[]');
         this.apiKey = localStorage.getItem('moonshot_api_key') || '';
         this.apiUrl = localStorage.getItem('moonshot_api_url') || 'https://api.moonshot.cn/v1/chat/completions';
@@ -987,7 +987,10 @@
             const input = document.getElementById('input');
             if (input) {
               input.value = transcript;
-              this.sendMessage();
+              // 延迟一点确保值已设置
+              setTimeout(() => {
+                this.sendMessage();
+              }, 100);
             }
           };
 
@@ -1991,6 +1994,9 @@
           });
 
           if (!response.ok) {
+            if (response.status === 429) {
+              throw new Error('请求太频繁，请稍后再试');
+            }
             throw new Error(`API请求失败: ${response.status}`);
           }
 
@@ -2164,6 +2170,9 @@
           });
 
           if (!response.ok) {
+            if (response.status === 429) {
+              throw new Error('请求太频繁，请稍后再试');
+            }
             throw new Error(`API请求失败: ${response.status}`);
           }
 
@@ -2292,10 +2301,11 @@
         });
 
         clearHistoryBtn?.addEventListener('click', () => {
-          if (confirm('确定要清空所有聊天记录吗？')) {
+          const roleName = this.currentRole?.name || '默认';
+          if (confirm(`确定要清空 ${roleName} 的聊天记录吗？`)) {
             this.chatHistory = [];
-            localStorage.removeItem('chat_history');
-            this.showNotification('聊天记录已清空', 'success');
+            this.saveRoleChatHistory();
+            this.showNotification(`${roleName} 的聊天记录已清空`, 'success');
             if (this.currentTab === 'chat') {
               this.showTab('chat');
             }
@@ -2548,8 +2558,8 @@
         const messageData = { role, content, timestamp: new Date().toISOString() };
         this.chatHistory.push(messageData);
 
-        // 持久化到 localStorage
-        localStorage.setItem('chat_history', JSON.stringify(this.chatHistory));
+        // 持久化到当前角色的localStorage
+        this.saveRoleChatHistory();
 
         const container = document.querySelector('.chat-container');
         if (!container) return;
@@ -2604,6 +2614,25 @@
       loadDefaultRole() {
         const roles = this.getRoles();
         this.currentRole = roles[0]; // 叶修作为默认角色
+        this.loadRoleChatHistory();
+      }
+
+      // 获取角色聊天记录的存储key
+      getChatHistoryKey() {
+        const roleId = this.currentRole?.id || 'default';
+        return `chat_history_${roleId}`;
+      }
+
+      // 加载当前角色的聊天记录
+      loadRoleChatHistory() {
+        const key = this.getChatHistoryKey();
+        this.chatHistory = JSON.parse(localStorage.getItem(key) || '[]');
+      }
+
+      // 保存当前角色的聊天记录
+      saveRoleChatHistory() {
+        const key = this.getChatHistoryKey();
+        localStorage.setItem(key, JSON.stringify(this.chatHistory));
       }
 
       // 循环切换吉祥物图片
@@ -2764,8 +2793,9 @@
           const role = roles.find(r => r.id === roleId);
           if (role) {
             window.app.currentRole = role;
+            window.app.loadRoleChatHistory(); // 加载新角色的聊天记录
             window.app.showNotification(`已切换到 ${role.name}`, 'success');
-            window.app.showTab('roles');
+            window.app.showTab('chat'); // 切换到聊天页面
           }
         }
 
