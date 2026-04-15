@@ -130,7 +130,7 @@
       display: flex;
       flex-direction: column;
       gap: 14px;
-      padding: 16px 16px 140px 16px;
+      padding: 16px 16px 80px 16px;
       height: 85%;
       overflow-y: auto;
     }
@@ -312,7 +312,7 @@
 
     .input-area {
       position: fixed;
-      bottom: 50px;
+      bottom: 10px;
       left: 0;
       right: 0;
       padding: 12px 16px;
@@ -1443,7 +1443,7 @@
         const bgStyle = chatBackground ? `background: linear-gradient(rgba(10,22,40,0.45), rgba(15,32,45,0.55)), url('${chatBackground}') center/cover no-repeat;` : '';
 
         return `
-          <div id="chat" style="${bgStyle} margin-bottom: 140px;">
+          <div id="chat" style="${bgStyle} margin-bottom: 60px;">
             <div class="chat-container" style="padding: 16px;">
               ${messages || welcomeMessage}
               <div class="typing-indicator">
@@ -1456,7 +1456,7 @@
             <div class="input-area">
               <input type="text" id="input" placeholder="输入消息，按Enter发送..." autocomplete="off" />
               <div class="btn-group">
-                <button id="voice-btn" class="action-btn" title="语音输入">'♪'</button>
+                <button id="voice-btn" class="action-btn" title="语音输入">♪</button>
                 <button id="send-btn" class="action-btn" title="发送消息">➤</button>
               </div>
             </div>
@@ -1489,7 +1489,7 @@
           <div class="roles-container" style="margin-bottom: 140px;">
             <h2>AI伙伴角色</h2>
             <p class="tab-description">
-              创建和管理不同的AI个性。点击角色切换，每个角色都有自己独特的特点和说话风格。
+              创建和管理不同的AI伙伴。点击角色切换，认识不同的朋友。
             </p>
 
             <div class="role-selector">
@@ -1505,7 +1505,7 @@
 
       getSettingsTab() {
         return `
-          <div class="settings-container">
+          <div class="settings-container" style="margin-bottom: 140px;">
             <div class="settings-section">
               <h3>API配置</h3>
               <div class="form-group" style="margin-bottom: 12px;">
