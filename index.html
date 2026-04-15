@@ -1152,7 +1152,7 @@
             </div>
 
             <!-- 🐠 我的水族馆 -->
-            <div style="margin-bottom: 80px;">
+            <div style="margin-bottom: 140px;">
               <h3 style="font-size: 18px; margin: 0 0 16px 0; color: #00e1ff; font-weight: 600; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; text-shadow: 0 0 10px rgba(0,225,255,0.5), 0 0 20px rgba(0,225,255,0.3); letter-spacing: 2px;">
                 水族馆 
                 <span style="font-size: 13px; color: #66ccff; font-weight: 400; text-shadow: 0 0 8px rgba(102,204,255,0.4);">(鱼儿正在等待投喂)</span>
@@ -1443,7 +1443,7 @@
         const bgStyle = chatBackground ? `background: linear-gradient(rgba(10,22,40,0.45), rgba(15,32,45,0.55)), url('${chatBackground}') center/cover no-repeat;` : '';
 
         return `
-          <div id="chat" style="${bgStyle}">
+          <div id="chat" style="${bgStyle} margin-bottom: 140px;">
             <div class="chat-container" style="padding: 16px;">
               ${messages || welcomeMessage}
               <div class="typing-indicator">
@@ -1486,7 +1486,7 @@
         }).join('');
 
         return `
-          <div class="roles-container">
+          <div class="roles-container" style="margin-bottom: 140px;">
             <h2>AI伙伴角色</h2>
             <p class="tab-description">
               创建和管理不同的AI个性。点击角色切换，每个角色都有自己独特的特点和说话风格。
@@ -1706,7 +1706,7 @@
         const hasTodayDiary = this.diaries.some(d => d.date === today);
 
         return `
-          <div class="diary-container" style="padding: 20px;">
+          <div class="diary-container" style="padding: 20px; margin-bottom: 140px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
               <h2 style="margin: 0;">我的日记</h2>
               <div style="display: flex; gap: 10px;">
