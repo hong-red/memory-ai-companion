@@ -770,6 +770,12 @@
       
       .input-area {
         padding: 10px 12px;
+        bottom: 60px;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      }
+      
+      .chat-container {
+        padding: 16px 16px 100px 16px;
       }
       
       #input {
@@ -785,6 +791,17 @@
       .modal-content {
         width: 95%;
         padding: 20px;
+      }
+      
+      /* 首页吉祥物移动端适配 */
+      .home-container .mascot-left img,
+      .home-container .mascot-right img {
+        width: 100px !important;
+        height: 100px !important;
+      }
+      
+      .home-container [style*="gap: 30px"] {
+        gap: 15px !important;
       }
     }
 
@@ -1037,7 +1054,7 @@
               <div style="font-size: 14px; color: #888; margin-bottom: 8px;">${dateStr} · ${timeStr}</div>
               
               <!-- 问候语和左右吉祥物 -->
-              <div style="display: flex; align-items: center; justify-content: center; gap: 70px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 30px; margin-bottom: 8px;">
                 <!-- 左吉祥物 -->
                 <div class="mascot-left" onclick="this.classList.add('waving'); setTimeout(()=>this.classList.remove('waving'), 1000);" style="cursor: pointer; filter: drop-shadow(0 6px 20px rgba(0,225,255,0.4));">
                   <img src="1.png" style="width: 150px; height: 150px; object-fit: contain;">
