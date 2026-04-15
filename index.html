@@ -987,10 +987,7 @@
             const input = document.getElementById('input');
             if (input) {
               input.value = transcript;
-              // 延迟一点确保值已设置
-              setTimeout(() => {
-                this.sendMessage();
-              }, 100);
+              this.showNotification('语音识别完成，请按发送', 'success');
             }
           };
 
