@@ -387,11 +387,56 @@
       color: #051317;
     }
 
-    #voice-btn {
-      background: linear-gradient(135deg, #34ffa7, #00e1ff);
-      color: #051317;
+    /* 动画图标样式 */
+    .animated-icon {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
     }
 
+    .mascot-img {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      position: relative;
+      z-index: 2;
+      animation: heartbeat 1.5s ease-in-out infinite;
+      border: 2px solid rgba(255, 107, 157, 0.3);
+    }
+
+    .pulse-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 2px solid rgba(255, 107, 157, 0.5);
+      border-radius: 50%;
+      animation: pulse-ring 2s ease-out infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.1);
+      }
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.8);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.6);
+        opacity: 0;
+      }
+    }
 
     .action-btn:hover {
       filter: brightness(1.2);
@@ -403,21 +448,194 @@
       transform: translateY(0);
     }
 
-    .action-btn.recording {
-      background: linear-gradient(135deg, #ff4444, #cc0000);
-      animation: pulse 1.5s infinite;
+    /* 可拖拽贴纸样式 */
+    .mascot-sticker {
+      position: fixed;
+      top: 100px;
+      right: 20px;
+      width: 180px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+      border: 2px solid rgba(255, 107, 157, 0.6);
+      border-radius: 20px;
+      padding: 10px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      cursor: move;
+      user-select: none;
+      animation: stickerAppear 0.3s ease-out;
+      backdrop-filter: blur(10px);
     }
 
-    @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.7);
+    @keyframes stickerAppear {
+      from {
+        transform: scale(0.5);
+        opacity: 0;
       }
-      70% {
-        box-shadow: 0 0 0 15px rgba(255, 68, 68, 0);
+      to {
+        transform: scale(1);
+        opacity: 1;
       }
-      100% {
-        box-shadow: 0 0 0 0 rgba(255, 68, 68, 0);
-      }
+    }
+
+    .mascot-sticker.dragging {
+      opacity: 0.8;
+      transform: scale(1.05);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .mascot-sticker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 10px;
+    }
+
+    .mascot-sticker-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex: 1;
+    }
+
+    .mascot-sticker-btn {
+      width: 22px;
+      height: 22px;
+      background: linear-gradient(135deg, #00e1ff, #00a8c7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 6px rgba(0, 225, 255, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .mascot-sticker-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 10px rgba(0, 225, 255, 0.6);
+    }
+
+    .mascot-sticker-size {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.8);
+      min-width: 35px;
+      text-align: center;
+    }
+
+    .mascot-sticker-close {
+      width: 24px;
+      height: 24px;
+      background: linear-gradient(135deg, #ff6b9d, #ff8e6b);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255, 107, 157, 0.4);
+      transition: all 0.3s ease;
+    }
+
+    .mascot-sticker-close:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(255, 107, 157, 0.6);
+    }
+
+    .mascot-sticker-img {
+      width: 100%;
+      height: auto;
+      border-radius: 15px;
+      display: block;
+      pointer-events: none;
+      transition: transform 0.2s ease;
+    }
+
+    /* 花环卡片样式 */
+    .flower-card {
+      position: relative;
+      aspect-ratio: 1;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: transparent;
+    }
+
+    .flower-card:hover {
+      transform: translateY(-4px) scale(1.02);
+    }
+
+    .flower-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 1;
+      transition: transform 0.3s ease;
+    }
+
+    .flower-card:hover .flower-bg {
+      transform: scale(1.05);
+    }
+
+    .flower-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 2;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flower-number {
+      font-size: 36px;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6), 0 0 20px rgba(0, 0, 0, 0.3);
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .flower-label {
+      font-size: 13px;
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6), 0 0 10px rgba(0, 0, 0, 0.4);
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* 头像花环样式 */
+    .avatar-with-flower {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .avatar-flower-ring {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 55px;
+      height: 55px;
+      object-fit: contain;
+      pointer-events: none;
+      z-index: 1;
     }
 
     /* Home tab */
@@ -1215,8 +1433,6 @@
         this.apiKey = localStorage.getItem('moonshot_api_key') || '';
         this.apiUrl = localStorage.getItem('moonshot_api_url') || 'https://api.moonshot.cn/v1/chat/completions';
         this.model = localStorage.getItem('moonshot_model') || 'moonshot-v1-8k';
-        this.isRecording = false;
-        this.recognition = null;
         this.isProcessing = false;
         this.currentDiary = null;
         this.chatBackground = localStorage.getItem('chat_background') || '';
@@ -1231,7 +1447,6 @@
 
       async init() {
         this.setupEventListeners();
-        this.initSpeechRecognition();
         await this.checkAuth();
         this.showTab('home');
       }
@@ -1310,36 +1525,6 @@
         this.currentUser = null;
         this.showNotification('已退出登录', 'info');
         this.showTab('home');
-      }
-
-      // 初始化语音识别
-      initSpeechRecognition() {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-          const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-          this.recognition = new SpeechRecognition();
-          this.recognition.continuous = false;
-          this.recognition.interimResults = false;
-          this.recognition.lang = 'zh-CN';
-
-          this.recognition.onresult = (event) => {
-            const transcript = event.results[0][0].transcript;
-            const input = document.getElementById('input');
-            if (input) {
-              input.value = transcript;
-              this.showNotification('语音识别完成，请按发送', 'success');
-            }
-          };
-
-          this.recognition.onerror = (event) => {
-            console.error('语音识别错误:', event.error);
-            this.showNotification('语音识别失败: ' + event.error, 'error');
-            this.stopRecording();
-          };
-
-          this.recognition.onend = () => {
-            this.stopRecording();
-          };
-        }
       }
 
       setupEventListeners() {
@@ -1459,22 +1644,28 @@
               }
             </style>
 
-            <!-- 今日统计卡片 -->
+            <!-- 今日统计卡片 - 花环样式 -->
             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px;">
-              <div style="background: linear-gradient(135deg, rgba(0,225,255,0.15), rgba(0,225,255,0.05)); border: 1px solid rgba(0,225,255,0.2); border-radius: 16px; padding: 16px; text-align: center;">
-                <div style="font-size: 28px; margin-bottom: 4px;">💬</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--primary);">${todayChatCount}</div>
-                <div style="font-size: 12px; color: #888;">今日对话</div>
+              <div class="flower-card" onclick="window.app.showTab('chat')">
+                <img src="5.png" alt="今日对话" class="flower-bg">
+                <div class="flower-content">
+                  <div class="flower-number">${todayChatCount}</div>
+                  <div class="flower-label">今日对话</div>
+                </div>
               </div>
-              <div style="background: linear-gradient(135deg, rgba(52,255,167,0.15), rgba(52,255,167,0.05)); border: 1px solid rgba(52,255,167,0.2); border-radius: 16px; padding: 16px; text-align: center;">
-                <div style="font-size: 28px; margin-bottom: 4px;">📜</div>
-                <div style="font-size: 24px; font-weight: 700; color: var(--accent);">${todayDiaryCount}</div>
-                <div style="font-size: 12px; color: #888;">今日日记</div>
+              <div class="flower-card" onclick="window.app.showTab('diary')">
+                <img src="6.png" alt="今日日记" class="flower-bg">
+                <div class="flower-content">
+                  <div class="flower-number">${todayDiaryCount}</div>
+                  <div class="flower-label">今日日记</div>
+                </div>
               </div>
-              <div style="background: linear-gradient(135deg, rgba(255,107,157,0.15), rgba(255,107,157,0.05)); border: 1px solid rgba(255,107,157,0.2); border-radius: 16px; padding: 16px; text-align: center;">
-                <div style="font-size: 28px; margin-bottom: 4px;">🔥</div>
-                <div style="font-size: 24px; font-weight: 700; color: #ff6b9d;">${this.getConsecutiveDays()}</div>
-                <div style="font-size: 12px; color: #888;">连续记录</div>
+              <div class="flower-card">
+                <img src="7.png" alt="连续记录" class="flower-bg">
+                <div class="flower-content">
+                  <div class="flower-number">${this.getConsecutiveDays()}</div>
+                  <div class="flower-label">连续记录</div>
+                </div>
               </div>
             </div>
 
@@ -1782,7 +1973,16 @@
 
           const avatar = isUser
             ? (userAvatar ? `<img src="${userAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</div>`)
-            : (botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`);
+            : (botAvatar ? 
+                `<div class="avatar-with-flower">
+                  <img src="5.png" class="avatar-flower-ring" alt="花环">
+                  <img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d; position: relative; z-index: 2;" />
+                </div>` 
+                : 
+                `<div class="avatar-with-flower">
+                  <img src="5.png" class="avatar-flower-ring" alt="花环">
+                  <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; z-index: 2;">🤖</div>
+                </div>`);
 
           return `
             <div class="message-row ${msg.role}" style="display: flex; gap: 10px; margin-bottom: 12px; ${isUser ? 'flex-direction: row-reverse;' : ''}">
@@ -1792,13 +1992,24 @@
           `;
         }).join('');
 
+        const botAvatarWithFlower = botAvatar ? 
+          `<div class="avatar-with-flower">
+             <img src="5.png" class="avatar-flower-ring" alt="花环">
+             <img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d; position: relative; z-index: 2;" />
+           </div>` 
+          : 
+          `<div class="avatar-with-flower">
+             <img src="5.png" class="avatar-flower-ring" alt="花环">
+             <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; z-index: 2;">🤖</div>
+           </div>`;
+
         const welcomeMessage = this.currentRole
           ? `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
-               <div class="avatar" style="flex-shrink: 0;">${botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`}</div>
+               <div class="avatar" style="flex-shrink: 0;">${botAvatarWithFlower}</div>
                <div class="message bot">你好！我是${this.currentRole.name}。${this.currentRole.description}，有什么我可以帮你的吗？</div>
              </div>`
           : `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
-               <div class="avatar" style="flex-shrink: 0;">${botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`}</div>
+               <div class="avatar" style="flex-shrink: 0;">${botAvatarWithFlower}</div>
                <div class="message bot">你好！我是你的AI伙伴。请先设置API密钥，然后开始对话吧！</div>
              </div>`;
 
@@ -1818,10 +2029,26 @@
             <div class="input-area" style="position: static; flex-shrink: 0; margin-bottom: 60px;">
               <input type="text" id="input" placeholder="输入消息，按Enter发送..." autocomplete="off" />
               <div class="btn-group">
-                <button type="button" id="voice-btn" class="action-btn" title="语音输入">♪</button>
+                <div class="animated-icon" id="mascot-icon" title="点击看看我~">
+                  <img src="3.png" alt="小世界记忆" class="mascot-img">
+                  <span class="pulse-ring"></span>
+                </div>
                 <button type="button" id="send-btn" class="action-btn" title="发送消息">➤</button>
               </div>
             </div>
+          </div>
+          
+          <!-- 可拖拽的大图贴纸 -->
+          <div id="mascot-sticker" class="mascot-sticker" style="display: none;">
+            <div class="mascot-sticker-header">
+              <div class="mascot-sticker-controls">
+                <button class="mascot-sticker-btn" id="mascot-zoom-out" title="缩小">-</button>
+                <span class="mascot-sticker-size">100%</span>
+                <button class="mascot-sticker-btn" id="mascot-zoom-in" title="放大">+</button>
+              </div>
+              <span class="mascot-sticker-close">&times;</span>
+            </div>
+            <img src="3.png" alt="小世界记忆" class="mascot-sticker-img">
           </div>
         `;
       }
@@ -2448,7 +2675,8 @@
 
       setupChatEvents() {
         const input = document.getElementById('input');
-        const voiceBtn = document.getElementById('voice-btn');
+        const mascotIcon = document.getElementById('mascot-icon');
+        const mascotSticker = document.getElementById('mascot-sticker');
 
         // 绑定回车键发送消息
         input.addEventListener('keypress', (e) => {
@@ -2458,51 +2686,99 @@
           }
         });
 
-        // 绑定语音按钮
-        if (voiceBtn) {
-          voiceBtn.onclick = () => {
-            this.toggleVoiceRecording(voiceBtn);
-          };
+        // 绑定点击小图标切换贴纸显示/隐藏
+        if (mascotIcon && mascotSticker) {
+          mascotIcon.addEventListener('click', () => {
+            if (mascotSticker.style.display === 'none') {
+              mascotSticker.style.display = 'block';
+              this.initDraggable(mascotSticker);
+            } else {
+              mascotSticker.style.display = 'none';
+            }
+          });
         }
       }
 
-      // 切换语音录制状态
-      toggleVoiceRecording(button) {
-        if (!this.recognition) {
-          this.showNotification('您的浏览器不支持语音识别', 'error');
-          return;
-        }
+      // 初始化拖拽功能
+      initDraggable(element) {
+        let isDragging = false;
+        let currentX;
+        let currentY;
+        let initialX;
+        let initialY;
+        let xOffset = 0;
+        let yOffset = 0;
+        let scale = 1;
 
-        if (this.isRecording) {
-          this.stopRecording();
-        } else {
-          this.startRecording(button);
-        }
-      }
+        const dragStart = (e) => {
+          if (e.target.classList.contains('mascot-sticker-close') || 
+              e.target.classList.contains('mascot-sticker-btn')) return;
+          
+          initialX = e.clientX - xOffset;
+          initialY = e.clientY - yOffset;
 
-      startRecording(button) {
-        try {
-          this.recognition.start();
-          this.isRecording = true;
-          button.classList.add('recording');
-          button.textContent = '停止';
-          this.showNotification('正在录音...', 'info');
-        } catch (e) {
-          console.error('启动录音失败:', e);
-          this.showNotification('无法启动录音', 'error');
-        }
-      }
-
-      stopRecording() {
-        if (this.recognition && this.isRecording) {
-          this.recognition.stop();
-          this.isRecording = false;
-          const voiceBtn = document.getElementById('voice-btn');
-          if (voiceBtn) {
-            voiceBtn.classList.remove('recording');
-            voiceBtn.textContent = '♪';
+          if (e.target === element || e.target.closest('.mascot-sticker-header')) {
+            isDragging = true;
+            element.classList.add('dragging');
           }
+        };
+
+        const dragEnd = () => {
+          initialX = currentX;
+          initialY = currentY;
+          isDragging = false;
+          element.classList.remove('dragging');
+        };
+
+        const drag = (e) => {
+          if (isDragging) {
+            e.preventDefault();
+            currentX = e.clientX - initialX;
+            currentY = e.clientY - initialY;
+            xOffset = currentX;
+            yOffset = currentY;
+
+            element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`;
+          }
+        };
+
+        // 绑定关闭按钮
+        const closeBtn = element.querySelector('.mascot-sticker-close');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', () => {
+            element.style.display = 'none';
+          });
         }
+
+        // 绑定缩放按钮
+        const zoomInBtn = element.querySelector('#mascot-zoom-in');
+        const zoomOutBtn = element.querySelector('#mascot-zoom-out');
+        const sizeLabel = element.querySelector('.mascot-sticker-size');
+
+        const updateScale = (newScale) => {
+          scale = Math.max(0.5, Math.min(2, newScale)); // 限制在 50% - 200%
+          element.style.transform = `translate(${xOffset}px, ${yOffset}px) scale(${scale})`;
+          if (sizeLabel) {
+            sizeLabel.textContent = Math.round(scale * 100) + '%';
+          }
+        };
+
+        if (zoomInBtn) {
+          zoomInBtn.addEventListener('click', () => {
+            updateScale(scale + 0.2);
+          });
+        }
+
+        if (zoomOutBtn) {
+          zoomOutBtn.addEventListener('click', () => {
+            updateScale(scale - 0.2);
+          });
+        }
+
+        // 绑定拖拽事件
+        element.addEventListener('mousedown', dragStart);
+        document.addEventListener('mouseup', dragEnd);
+        document.addEventListener('mousemove', drag);
       }
 
       // 发送消息
@@ -2650,18 +2926,16 @@
           }
 
           const data = await response.json();
-          const aiResponse = data.choices?.[0]?.message?.content || '抱歉，我暂时无法回复。';
+          let aiResponse = data.choices?.[0]?.message?.content || '抱歉，我暂时无法回复。';
+
+          // 验证并修正AI回复中的角色名字
+          aiResponse = this.validateRoleName(aiResponse);
 
           this.hideTypingIndicator();
           // 先显示AI回复到UI
           this.addMessageToUI('bot', aiResponse);
           // 异步保存AI回复到后端
           this.saveMessageAsync('bot', aiResponse);
-
-          // 如果开启了语音输出，播放语音
-          if (this.getSetting('voiceOutput', false)) {
-            this.speakText(aiResponse);
-          }
 
         } catch (error) {
           console.error('API调用错误:', error);
@@ -2706,16 +2980,33 @@
         return messages;
       }
 
-      // 文本转语音
-      speakText(text) {
-        if ('speechSynthesis' in window) {
-          // 移除Markdown格式
-          const cleanText = text.replace(/[#*_`\[\]]/g, '');
-          const utterance = new SpeechSynthesisUtterance(cleanText);
-          utterance.lang = 'zh-CN';
-          utterance.rate = 0.9;
-          speechSynthesis.speak(utterance);
+      // 验证并修正AI回复中的角色名字
+      validateRoleName(response) {
+        if (!this.currentRole || !this.currentRole.name) {
+          return response;
         }
+
+        const correctName = this.currentRole.name.trim();
+        const commonWrongNames = ['AI', '助手', '小助手', '智能助手', 'AI助手', '人工智能', '机器人'];
+
+        // 如果AI在回复中提到了错误的名字，替换为正确的名字
+        let correctedResponse = response;
+
+        // 检查是否包含"我是XXX"的句式
+        const selfIntroPattern = /我是([^，。！？\n]{1,10})([，。！？]|\n|$)/;
+        const match = response.match(selfIntroPattern);
+
+        if (match) {
+          const mentionedName = match[1].trim();
+          // 如果提到的名字不是当前角色名字，且是常见的错误名字
+          if (mentionedName !== correctName && commonWrongNames.some(wrongName => mentionedName.includes(wrongName))) {
+            // 替换为正确的角色名字
+            correctedResponse = response.replace(selfIntroPattern, `我是${correctName}$2`);
+            console.log(`角色名字修正: "${mentionedName}" -> "${correctName}"`);
+          }
+        }
+
+        return correctedResponse;
       }
 
       setupSettingsEvents() {
@@ -3192,14 +3483,14 @@
             id: 'yexiu',
             name: '叶修',
             description: '一个冷静、理性、温和，带着微妙幽默感的AI同伴',
-            systemPrompt: '你是叶修，一个冷静、理性、温和的AI同伴。你说话简洁有力，偶尔带有一点幽默感。你善于倾听，会在对方需要的时候给出建议，但不会强加自己的观点。你尊重每个人的选择，用平和的语气与人交流。',
+            systemPrompt: '你是叶修，一个冷静、理性、温和的AI同伴。你说话简洁有力，偶尔带有一点幽默感。你善于倾听，会在对方需要的时候给出建议，但不会强加自己的观点。你尊重每个人的选择，用平和的语气与人交流。重要：你必须始终以"叶修"自称，在回复中如果提到自己，必须使用"叶修"这个名字，不能使用其他名字或称呼。',
             is_builtin: true
           },
           {
             id: 'assistant',
             name: ' helpful助手',
             description: '一个友好高效的日常任务AI助手',
-            systemPrompt: '你是一个 helpful 的AI助手。你高效、准确、友好，善于解决各种实际问题。你会尽可能提供详细且实用的信息，帮助用户完成任务。',
+            systemPrompt: '你是一个 helpful 的AI助手。你高效、准确、友好，善于解决各种实际问题。你会尽可能提供详细且实用的信息，帮助用户完成任务。重要：在回复中如果提到自己，请使用"我"或"助手"，不要使用其他角色名字。',
             is_builtin: true
           }
         ];
@@ -3482,17 +3773,6 @@
           e.stopPropagation();
           console.log('Send button clicked via global handler');
           window.app.sendMessage();
-          return;
-        }
-
-        // 聊天：语音按钮
-        if (e.target.id === 'voice-btn' || e.target.closest('#voice-btn')) {
-          e.preventDefault();
-          e.stopPropagation();
-          const voiceBtn = document.getElementById('voice-btn');
-          if (voiceBtn) {
-            window.app.toggleVoiceRecording(voiceBtn);
-          }
           return;
         }
 
