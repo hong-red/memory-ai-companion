@@ -4,6 +4,28 @@
 
 ![应用截图](screenshot.png)
 
+## 📋 项目分支说明
+
+本项目有两个主要分支，适用于不同场景：
+
+### 🌿 main 分支 - 纯前端 PWA 版本
+**适合**：快速体验、个人本地使用、无需服务器的场景
+- ✅ 纯前端实现，无需后端服务器
+- ✅ 支持 PWA 安装，可像原生应用一样使用
+- ✅ 数据存储在浏览器 LocalStorage
+- ✅ 部署在 GitHub Pages：https://hong-red.github.io/memory-ai-companion/
+- ⚠️ 数据仅在本地浏览器保存，清除缓存会丢失
+- ⚠️ 无法跨设备同步数据
+
+### 🔧 master 分支 - 前后端完整版本
+**适合**：正式使用、需要数据持久化、多设备同步的场景
+- ✅ 完整的用户系统和数据持久化
+- ✅ 后端 API + 数据库存储
+- ✅ 支持多设备数据同步
+- ✅ 数据安全存储在服务器
+- ✅ 部署地址：http://81.70.191.44:3000
+- ⚠️ 需要服务器部署
+
 ## ✨ 主要功能
 
 ### 🤖 智能对话
@@ -33,7 +55,7 @@
 - 花环风格的统计卡片设计
 - 支持拖拽表情包贴纸
 
-### 🔐 用户系统
+### 🔐 用户系统（仅 master 分支）
 - 用户注册和登录
 - 数据持久化存储（SQLite）
 - 支持未登录状态下的本地体验
@@ -42,30 +64,48 @@
 
 ### 方式一：直接使用（推荐）
 
-访问部署好的网站：
-- 前端：http://81.70.191.44:3000
+根据您的需求选择：
+
+| 需求 | 推荐版本 | 访问地址 |
+|------|---------|---------|
+| 快速体验、本地使用 | PWA 版本 | https://hong-red.github.io/memory-ai-companion/ |
+| 正式使用、数据同步 | 完整版本 | http://81.70.191.44:3000 |
 
 ### 方式二：本地运行
 
-1. 克隆项目
+#### 运行 PWA 版本（main 分支）
+
 ```bash
-git clone -b master https://github.com/hong-red/memory-ai-companion.git
+# 克隆 main 分支
+git clone -b main https://github.com/hong-red/memory-ai-companion.git
 cd memory-ai-companion
+
+# 直接用浏览器打开 index.html
+# 或启动本地服务器
+npx serve .
 ```
 
-2. 启动后端服务
+#### 运行完整版本（master 分支）
+
 ```bash
+# 克隆 master 分支
+git clone -b master https://github.com/hong-red/memory-ai-companion.git
+cd memory-ai-companion
+
+# 启动后端服务
 cd server
 npm install
 npm start
+
+# 访问应用
+# 打开浏览器访问 http://localhost:3000
 ```
 
-3. 访问应用
-打开浏览器访问 `http://localhost:3000`
-
-### 方式三：Docker 部署
+### 方式三：Docker 部署（仅 master 分支）
 
 ```bash
+git clone -b master https://github.com/hong-red/memory-ai-companion.git
+cd memory-ai-companion
 docker-compose up -d
 ```
 
@@ -77,7 +117,7 @@ docker-compose up -d
 2. 在控制台创建 API Key
 3. 在应用设置页面填入 API Key
 
-### 环境变量（后端）
+### 环境变量（仅 master 分支后端）
 
 创建 `server/.env` 文件：
 
@@ -89,20 +129,21 @@ NODE_ENV=production
 
 ## 🛠️ 技术栈
 
-### 前端
+### 前端（两个分支相同）
 - 纯 HTML5 / CSS3 / JavaScript（ES6+）
 - 响应式设计，支持桌面端和移动端
 - CSS 动画和过渡效果
-- LocalStorage 本地缓存
+- LocalStorage 本地缓存（main 分支）
 
-### 后端
+### 后端（仅 master 分支）
 - Node.js + Express
 - SQLite3 数据库
 - JWT 身份认证
 - RESTful API 设计
 
 ### 部署
-- PM2 进程管理
+- GitHub Pages（main 分支 PWA 版本）
+- PM2 进程管理（master 分支）
 - Nginx 反向代理（可选）
 - Docker 容器化支持
 
