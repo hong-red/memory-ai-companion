@@ -616,6 +616,38 @@
       letter-spacing: 1px;
     }
 
+    /* 移动端花环样式优化 */
+    @media (max-width: 768px) {
+      .flower-card {
+        min-height: 120px;
+      }
+      
+      .flower-number {
+        font-size: 28px;
+      }
+      
+      .flower-label {
+        font-size: 11px;
+        letter-spacing: 0.5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .flower-card {
+        min-height: 100px;
+      }
+      
+      .flower-number {
+        font-size: 24px;
+        margin-bottom: 1px;
+      }
+      
+      .flower-label {
+        font-size: 10px;
+        letter-spacing: 0.3px;
+      }
+    }
+
     /* Home tab */
     .home-container {
       text-align: center;
