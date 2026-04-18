@@ -12,8 +12,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 
-// 中间件
-app.use(cors());
+// 中间件 - CORS配置
+app.use(cors({
+  origin: '*',  // 允许所有来源，生产环境建议指定具体域名
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -80,18 +85,36 @@ const upload = multer({
 
 // 注册
 app.post('/api/auth/register', async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   
   if (!username || !password) {
     return res.status(400).json({ error: 'Username and password are required' });
+  }
+
+  // 验证用户名长度
+  if (username.length < 2 || username.length > 20) {
+    return res.status(400).json({ error: 'Username must be between 2 and 20 characters' });
+  }
+
+  // 验证密码长度
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Password must be at least 6 characters' });
+  }
+
+  // 验证邮箱格式
+  if (email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     
     db.run(
-      'INSERT INTO users (username, password) VALUES (?, ?)',
-      [username, hashedPassword],
+      'INSERT INTO users (username, password, email) VALUES (?, ?, ?)',
+      [username, hashedPassword, email || null],
       function(err) {
         if (err) {
           if (err.message.includes('UNIQUE constraint failed')) {
@@ -114,7 +137,7 @@ app.post('/api/auth/register', async (req, res) => {
         );
         
         const token = jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '7d' });
-        res.json({ token, user: { id: userId, username } });
+        res.json({ token, user: { id: userId, username, email: email || null } });
       }
     );
   } catch (error) {
@@ -574,8 +597,10 @@ app.post('/api/upload', authenticateToken, upload.single('file'), (req, res) => 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });
   }
-  
-  const fileUrl = `/uploads/${req.file.filename}`;
+
+  const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+  const host = req.headers['x-forwarded-host'] || req.headers.host;
+  const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
   res.json({ url: fileUrl, filename: req.file.filename });
 });
 
