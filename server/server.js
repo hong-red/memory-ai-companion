@@ -38,7 +38,128 @@ const db = new sqlite3.Database(dbPath, (err) => {
     return;
   }
   console.log('Connected to SQLite database');
+  
+  // 初始化数据库表
+  initializeDatabase();
 });
+
+// 初始化数据库表
+function initializeDatabase() {
+  db.serialize(() => {
+    // 用户表
+    db.run(`CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      email TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`, (err) => {
+      if (err) console.error('Error creating users table:', err);
+      else console.log('Users table ready');
+    });
+
+    // 角色表
+    db.run(`CREATE TABLE IF NOT EXISTS roles (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      name TEXT NOT NULL,
+      description TEXT,
+      system_prompt TEXT,
+      is_builtin INTEGER DEFAULT 0,
+      is_default INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`, (err) => {
+      if (err) console.error('Error creating roles table:', err);
+      else console.log('Roles table ready');
+    });
+
+    // 聊天记录表
+    db.run(`CREATE TABLE IF NOT EXISTS chat_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      role_id TEXT NOT NULL,
+      role TEXT NOT NULL,
+      content TEXT NOT NULL,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`, (err) => {
+      if (err) console.error('Error creating chat_messages table:', err);
+      else console.log('Chat messages table ready');
+    });
+
+    // 日记表
+    db.run(`CREATE TABLE IF NOT EXISTS diaries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      date TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      mood TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`, (err) => {
+      if (err) console.error('Error creating diaries table:', err);
+      else console.log('Diaries table ready');
+    });
+
+    // 用户设置表
+    db.run(`CREATE TABLE IF NOT EXISTS user_settings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER UNIQUE NOT NULL,
+      api_key TEXT,
+      api_url TEXT DEFAULT 'https://api.moonshot.cn/v1/chat/completions',
+      model TEXT DEFAULT 'moonshot-v1-8k',
+      current_role_id INTEGER,
+      chat_background TEXT,
+      user_avatar TEXT,
+      bot_avatar TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )`, (err) => {
+      if (err) console.error('Error creating user_settings table:', err);
+      else console.log('User settings table ready');
+    });
+
+    // 插入默认内置角色（如果不存在）
+    db.get("SELECT COUNT(*) as count FROM roles WHERE is_builtin = 1", (err, row) => {
+      if (err) {
+        console.error('Error checking builtin roles:', err);
+        return;
+      }
+      
+      if (row.count === 0) {
+        const defaultRoles = [
+          {
+            name: '叶修',
+            description: '一个冷静、理性、温和，带着微妙幽默感的AI同伴',
+            system_prompt: '你是叶修，一个冷静、理性、温和的AI同伴。你说话简洁有力，偶尔带有一点幽默感。你善于倾听，会在对方需要的时候给出建议，但不会强加自己的观点。你尊重每个人的选择，用平和的语气与人交流。重要：你必须始终以"叶修"自称，在回复中如果提到自己，必须使用"叶修"这个名字，不能使用其他名字或称呼。'
+          },
+          {
+            name: 'helpful助手',
+            description: '一个友好高效的日常任务AI助手',
+            system_prompt: '你是一个 helpful 的AI助手。你高效、准确、友好，善于解决各种实际问题。你会尽可能提供详细且实用的信息，帮助用户完成任务。重要：在回复中如果提到自己，请使用"我"或"助手"，不要使用其他角色名字。'
+          }
+        ];
+
+        const stmt = db.prepare(`INSERT INTO roles (user_id, name, description, system_prompt, is_builtin, is_default) VALUES (NULL, ?, ?, ?, 1, ?)`);
+        
+        defaultRoles.forEach((role, index) => {
+          stmt.run(role.name, role.description, role.system_prompt, index === 0 ? 1 : 0, (err) => {
+            if (err) console.error('Error inserting default role:', err);
+          });
+        });
+        
+        stmt.finalize();
+        console.log('Default builtin roles created');
+      }
+    });
+  });
+}
 
 // JWT验证中间件
 const authenticateToken = (req, res, next) => {

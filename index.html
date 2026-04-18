@@ -616,28 +616,6 @@
       letter-spacing: 1px;
     }
 
-    /* 头像花环样式 */
-    .avatar-with-flower {
-      position: relative;
-      width: 50px;
-      height: 50px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .avatar-flower-ring {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 55px;
-      height: 55px;
-      object-fit: contain;
-      pointer-events: none;
-      z-index: 1;
-    }
-
     /* Home tab */
     .home-container {
       text-align: center;
@@ -1531,6 +1509,8 @@
         // Navigation
         document.getElementById('nav').addEventListener('click', (e) => {
           if (e.target.tagName === 'BUTTON') {
+            e.preventDefault();
+            e.stopPropagation();
             this.showTab(e.target.dataset.tab);
           }
         });
@@ -1550,38 +1530,70 @@
       }
 
       showTab(tabName) {
-        // 更新导航
-        document.querySelectorAll('#nav button').forEach(btn => {
-          btn.classList.remove('active');
-          if (btn.dataset.tab === tabName) {
-            btn.classList.add('active');
-          }
-        });
+        console.log('showTab called:', tabName);
+        
+        try {
+          // 更新导航
+          document.querySelectorAll('#nav button').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.dataset.tab === tabName) {
+              btn.classList.add('active');
+            }
+          });
 
-        // 显示标签内容
-        const tabContent = document.getElementById('tab-content');
-        
-        switch(tabName) {
-          case 'home':
-            tabContent.innerHTML = this.getHomeTab();
-            break;
-          case 'chat':
-            tabContent.innerHTML = this.getChatTab();
-            this.setupChatEvents();
-            break;
-          case 'diary':
-            tabContent.innerHTML = this.getDiaryTab();
-            break;
-          case 'roles':
-            tabContent.innerHTML = this.getRolesTab();
-            break;
-          case 'settings':
-            tabContent.innerHTML = this.getSettingsTab();
-            this.setupSettingsEvents();
-            break;
+          // 显示标签内容
+          const tabContent = document.getElementById('tab-content');
+          if (!tabContent) {
+            console.error('tab-content element not found');
+            return;
+          }
+          
+          let html = '';
+          switch(tabName) {
+            case 'home':
+              html = this.getHomeTab();
+              break;
+            case 'chat':
+              html = this.getChatTab();
+              break;
+            case 'diary':
+              html = this.getDiaryTab();
+              break;
+            case 'roles':
+              html = this.getRolesTab();
+              break;
+            case 'settings':
+              html = this.getSettingsTab();
+              break;
+            default:
+              console.error('Unknown tab:', tabName);
+              return;
+          }
+          
+          // 使用try-catch来捕获innerHTML设置时的错误
+          try {
+            tabContent.innerHTML = html;
+          } catch (e) {
+            console.error('Error setting innerHTML:', e);
+            tabContent.innerHTML = '<div style="padding: 20px; text-align: center;">加载页面时出错，请刷新重试</div>';
+            return;
+          }
+          
+          // 设置事件监听
+          switch(tabName) {
+            case 'chat':
+              this.setupChatEvents();
+              break;
+            case 'settings':
+              this.setupSettingsEvents();
+              break;
+          }
+          
+          this.currentTab = tabName;
+          console.log('showTab completed:', tabName);
+        } catch (error) {
+          console.error('Error in showTab:', error);
         }
-        
-        this.currentTab = tabName;
       }
 
       getHomeTab() {
@@ -1661,7 +1673,7 @@
                 </div>
               </div>
               <div class="flower-card">
-                <img src="7.png" alt="连续记录" class="flower-bg">
+                <img src="5.png" alt="连续记录" class="flower-bg">
                 <div class="flower-content">
                   <div class="flower-number">${this.getConsecutiveDays()}</div>
                   <div class="flower-label">连续记录</div>
@@ -1967,58 +1979,75 @@
         const botAvatar = this.botAvatar || '';
         const chatBackground = this.chatBackground || '';
 
-        const messages = this.chatHistory.slice(-50).map(msg => {
-          const formattedContent = this.formatMessage(msg.content);
-          const isUser = msg.role === 'user';
+        // 安全地生成消息HTML
+        let messagesHtml = '';
+        try {
+          const recentMessages = Array.isArray(this.chatHistory) ? this.chatHistory.slice(-50) : [];
+          messagesHtml = recentMessages.map(msg => {
+            if (!msg || typeof msg !== 'object') return '';
+            const role = msg.role || 'bot';
+            const content = msg.content || '';
+            const formattedContent = this.formatMessage(content);
+            const isUser = role === 'user';
 
-          const avatar = isUser
-            ? (userAvatar ? `<img src="${userAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</div>`)
-            : (botAvatar ? 
-                `<div class="avatar-with-flower">
-                  <img src="5.png" class="avatar-flower-ring" alt="花环">
-                  <img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d; position: relative; z-index: 2;" />
-                </div>` 
-                : 
-                `<div class="avatar-with-flower">
-                  <img src="5.png" class="avatar-flower-ring" alt="花环">
-                  <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; z-index: 2;">🤖</div>
-                </div>`);
+            const avatar = isUser
+              ? (userAvatar ? `<img src="${userAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</div>`)
+              : (botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`);
 
-          return `
-            <div class="message-row ${msg.role}" style="display: flex; gap: 10px; margin-bottom: 12px; ${isUser ? 'flex-direction: row-reverse;' : ''}">
-              <div class="avatar" style="flex-shrink: 0;">${avatar}</div>
-              <div class="message ${msg.role}" style="max-width: calc(100% - 50px);">${formattedContent}</div>
-            </div>
-          `;
-        }).join('');
+            return `
+              <div class="message-row ${role}" style="display: flex; gap: 10px; margin-bottom: 12px; ${isUser ? 'flex-direction: row-reverse;' : ''}">
+                <div class="avatar" style="flex-shrink: 0;">${avatar}</div>
+                <div class="message ${role}" style="max-width: calc(100% - 50px);">${formattedContent}</div>
+              </div>
+            `;
+          }).join('');
+        } catch (e) {
+          console.error('Error generating messages HTML:', e);
+          messagesHtml = '';
+        }
 
-        const botAvatarWithFlower = botAvatar ? 
-          `<div class="avatar-with-flower">
-             <img src="5.png" class="avatar-flower-ring" alt="花环">
-             <img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d; position: relative; z-index: 2;" />
-           </div>` 
-          : 
-          `<div class="avatar-with-flower">
-             <img src="5.png" class="avatar-flower-ring" alt="花环">
-             <div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; z-index: 2;">🤖</div>
-           </div>`;
-
-        const welcomeMessage = this.currentRole
-          ? `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
-               <div class="avatar" style="flex-shrink: 0;">${botAvatarWithFlower}</div>
-               <div class="message bot">你好！我是${this.currentRole.name}。${this.currentRole.description}，有什么我可以帮你的吗？</div>
-             </div>`
-          : `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
-               <div class="avatar" style="flex-shrink: 0;">${botAvatarWithFlower}</div>
+        // 安全地生成欢迎消息
+        let welcomeMessage = '';
+        try {
+          const roleName = (this.currentRole && this.currentRole.name) ? this.currentRole.name : '';
+          const roleDesc = (this.currentRole && this.currentRole.description) ? this.currentRole.description : '';
+          
+          if (roleName) {
+            welcomeMessage = `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
+               <div class="avatar" style="flex-shrink: 0;">${botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`}</div>
+               <div class="message bot">你好！我是${roleName}。${roleDesc || '有什么我可以帮你的吗？'}</div>
+             </div>`;
+          } else {
+            welcomeMessage = `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
+               <div class="avatar" style="flex-shrink: 0;">${botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`}</div>
                <div class="message bot">你好！我是你的AI伙伴。请先设置API密钥，然后开始对话吧！</div>
              </div>`;
+          }
+        } catch (e) {
+          console.error('Error generating welcome message:', e);
+          welcomeMessage = `<div class="message-row bot" style="display: flex; gap: 10px; margin-bottom: 12px;">
+               <div class="avatar" style="flex-shrink: 0;"><div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div></div>
+               <div class="message bot">你好！我是你的AI伙伴。</div>
+             </div>`;
+        }
 
-        const bgStyle = chatBackground ? `background: linear-gradient(rgba(10,22,40,0.45), rgba(15,32,45,0.55)), url('${chatBackground}') center/cover no-repeat;` : '';
+        // 安全地处理背景图片URL，防止特殊字符破坏HTML
+        let bgStyle = '';
+        if (chatBackground) {
+          try {
+            // 使用CSS转义来处理特殊字符
+            const escapedUrl = chatBackground.replace(/'/g, "\\'").replace(/"/g, '\\"');
+            bgStyle = `background: linear-gradient(rgba(10,22,40,0.45), rgba(15,32,45,0.55)), url('${escapedUrl}') center/cover no-repeat;`;
+          } catch (e) {
+            console.error('Error processing chat background:', e);
+            bgStyle = '';
+          }
+        }
 
         return `
           <div id="chat" style="${bgStyle} display: flex; flex-direction: column; height: calc(100vh - 60px); margin-bottom: 0;">
             <div class="chat-container" style="flex: 1; overflow-y: auto; padding: 16px;">
-              ${messages || welcomeMessage}
+              ${messagesHtml || welcomeMessage}
               <div class="typing-indicator">
                 <span></span>
                 <span></span>
@@ -2230,7 +2259,7 @@
                 <strong>2. 创建角色：</strong><br>
                 在"角色"标签页创建自定义AI伴侣个性<br><br>
                 <strong>3. 开始对话：</strong><br>
-                输入消息或点击语音按钮说话，AI会自动回复<br><br>
+                输入消息，AI会自动回复<br><br>
                 <strong>4. 快捷键：</strong><br>
                 Enter - 发送消息 | Shift+Enter - 换行
               </p>
@@ -2675,16 +2704,30 @@
 
       setupChatEvents() {
         const input = document.getElementById('input');
+        const sendBtn = document.getElementById('send-btn');
         const mascotIcon = document.getElementById('mascot-icon');
         const mascotSticker = document.getElementById('mascot-sticker');
 
         // 绑定回车键发送消息
-        input.addEventListener('keypress', (e) => {
-          if (e.key === 'Enter' && !e.shiftKey) {
+        if (input) {
+          input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              console.log('Enter key pressed, calling sendMessage');
+              this.sendMessage();
+            }
+          });
+        }
+
+        // 绑定发送按钮点击事件
+        if (sendBtn) {
+          sendBtn.addEventListener('click', (e) => {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('Send button clicked, calling sendMessage');
             this.sendMessage();
-          }
-        });
+          });
+        }
 
         // 绑定点击小图标切换贴纸显示/隐藏
         if (mascotIcon && mascotSticker) {
@@ -2783,17 +2826,23 @@
 
       // 发送消息
       async sendMessage() {
-        console.log('sendMessage called');
-        const input = document.getElementById('input');
-        const message = input.value.trim();
-        console.log('Message:', message);
-
-        if (!message) {
-          console.log('Empty message, returning');
-          return;
-        }
-
+        console.log('sendMessage called at', new Date().toISOString());
+        
         try {
+          const input = document.getElementById('input');
+          if (!input) {
+            console.error('Input element not found');
+            return;
+          }
+          
+          const message = input.value.trim();
+          console.log('Message:', message);
+
+          if (!message) {
+            console.log('Empty message, returning');
+            return;
+          }
+
           // 添加用户消息到界面（先显示，不等待保存完成）
           this.addMessageToUI('user', message);
           input.value = '';
@@ -2811,7 +2860,7 @@
         } catch (error) {
           console.error('Error in sendMessage:', error);
           this.hideTypingIndicator();
-          this.addMessageToUI('bot', '抱歉，发送消息时出错了：' + error.message);
+          this.addMessageToUI('bot', '抱歉，发送消息时出错了：' + (error.message || '未知错误'));
         }
       }
 
@@ -2835,41 +2884,54 @@
 
       // 添加消息到UI（仅UI，不保存）
       addMessageToUI(role, content) {
-        const messageData = { role, content, timestamp: new Date().toISOString() };
-        this.chatHistory.push(messageData);
+        try {
+          console.log('addMessageToUI called:', role, content);
+          
+          // 验证参数
+          if (!role || typeof content === 'undefined') {
+            console.error('Invalid parameters for addMessageToUI:', role, content);
+            return;
+          }
+          
+          const messageData = { role, content: content || '', timestamp: new Date().toISOString() };
+          this.chatHistory.push(messageData);
 
-        const container = document.querySelector('.chat-container');
-        if (!container) {
-          console.error('Chat container not found');
-          return;
+          const container = document.querySelector('.chat-container');
+          if (!container) {
+            console.error('Chat container not found');
+            return;
+          }
+
+          const isUser = role === 'user';
+          const userAvatar = this.userAvatar || '';
+          const botAvatar = this.botAvatar || '';
+
+          const avatar = isUser
+            ? (userAvatar ? `<img src="${userAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</div>`)
+            : (botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`);
+
+          const rowDiv = document.createElement('div');
+          rowDiv.className = `message-row ${role}`;
+          rowDiv.style.cssText = `display: flex; gap: 10px; margin-bottom: 12px; ${isUser ? 'flex-direction: row-reverse;' : ''}`;
+
+          const formattedContent = this.formatMessage(content);
+          rowDiv.innerHTML = `
+            <div class="avatar" style="flex-shrink: 0;">${avatar}</div>
+            <div class="message ${role}" style="max-width: calc(100% - 50px);">${formattedContent}</div>
+          `;
+
+          const typingIndicator = container.querySelector('.typing-indicator');
+          if (typingIndicator) {
+            container.insertBefore(rowDiv, typingIndicator);
+          } else {
+            container.appendChild(rowDiv);
+          }
+
+          container.scrollTop = container.scrollHeight;
+          console.log('addMessageToUI completed successfully');
+        } catch (error) {
+          console.error('Error in addMessageToUI:', error);
         }
-
-        const isUser = role === 'user';
-        const userAvatar = this.userAvatar || '';
-        const botAvatar = this.botAvatar || '';
-
-        const avatar = isUser
-          ? (userAvatar ? `<img src="${userAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; font-size: 18px;">👤</div>`)
-          : (botAvatar ? `<img src="${botAvatar}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #ff6b9d;" />` : `<div style="width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #ff6b9d, #ff8e6b); display: flex; align-items: center; justify-content: center; font-size: 18px;">🤖</div>`);
-
-        const rowDiv = document.createElement('div');
-        rowDiv.className = `message-row ${role}`;
-        rowDiv.style.cssText = `display: flex; gap: 10px; margin-bottom: 12px; ${isUser ? 'flex-direction: row-reverse;' : ''}`;
-
-        const formattedContent = this.formatMessage(content);
-        rowDiv.innerHTML = `
-          <div class="avatar" style="flex-shrink: 0;">${avatar}</div>
-          <div class="message ${role}" style="max-width: calc(100% - 50px);">${formattedContent}</div>
-        `;
-
-        const typingIndicator = container.querySelector('.typing-indicator');
-        if (typingIndicator) {
-          container.insertBefore(rowDiv, typingIndicator);
-        } else {
-          container.appendChild(rowDiv);
-        }
-
-        container.scrollTop = container.scrollHeight;
       }
 
       // 显示输入指示器
@@ -2890,11 +2952,13 @@
 
       // 调用AI API
       async getAIResponse(userMessage) {
-        console.log('getAIResponse called, apiKey:', this.apiKey ? '已设置' : '未设置');
+        console.log('getAIResponse called at', new Date().toISOString());
+        console.log('apiKey:', this.apiKey ? '已设置' : '未设置');
         console.log('apiUrl:', this.apiUrl);
         console.log('model:', this.model);
         
         if (!this.apiKey) {
+          console.log('No API key, showing message');
           this.hideTypingIndicator();
           this.addMessageToUI('bot', '请先设置API密钥才能开始对话。点击"设置"标签页添加您的Moonshot API密钥。');
           return;
@@ -2904,19 +2968,25 @@
           const messages = this.buildAPIMessages(userMessage);
           console.log('Sending messages to API:', messages);
 
-          const response = await fetch(this.apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${this.apiKey}`
-            },
-            body: JSON.stringify({
-              model: this.model,
-              messages: messages,
-              temperature: 0.7,
-              max_tokens: 2000
-            })
-          });
+          let response;
+          try {
+            response = await fetch(this.apiUrl, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.apiKey}`
+              },
+              body: JSON.stringify({
+                model: this.model,
+                messages: messages,
+                temperature: 0.7,
+                max_tokens: 2000
+              })
+            });
+          } catch (fetchError) {
+            console.error('Fetch error:', fetchError);
+            throw new Error('网络请求失败，请检查网络连接');
+          }
 
           if (!response.ok) {
             if (response.status === 429) {
@@ -2925,11 +2995,16 @@
             throw new Error(`API请求失败: ${response.status}`);
           }
 
-          const data = await response.json();
-          let aiResponse = data.choices?.[0]?.message?.content || '抱歉，我暂时无法回复。';
-
-          // 验证并修正AI回复中的角色名字
-          aiResponse = this.validateRoleName(aiResponse);
+          let data;
+          try {
+            data = await response.json();
+          } catch (jsonError) {
+            console.error('JSON parse error:', jsonError);
+            throw new Error('解析API响应失败');
+          }
+          
+          const aiResponse = data.choices?.[0]?.message?.content || '抱歉，我暂时无法回复。';
+          console.log('AI Response received:', aiResponse.substring(0, 100) + '...');
 
           this.hideTypingIndicator();
           // 先显示AI回复到UI
@@ -2940,7 +3015,7 @@
         } catch (error) {
           console.error('API调用错误:', error);
           this.hideTypingIndicator();
-          const errorMsg = `抱歉，发生了错误：${error.message}`;
+          const errorMsg = `抱歉，发生了错误：${error.message || '未知错误'}`;
           this.addMessageToUI('bot', errorMsg);
           this.saveMessageAsync('bot', errorMsg);
         }
@@ -2948,65 +3023,46 @@
 
       // 构建API消息
       buildAPIMessages(userMessage) {
-        const messages = [];
+        try {
+          const messages = [];
 
-        // 添加系统提示词
-        console.log('buildAPIMessages - currentRole:', this.currentRole);
-        if (this.currentRole) {
-          console.log('buildAPIMessages - systemPrompt:', this.currentRole.systemPrompt);
-          messages.push({
-            role: 'system',
-            content: this.currentRole.systemPrompt
-          });
-        }
-
-        // 添加历史消息（最近10条）
-        const recentHistory = this.chatHistory.slice(-10);
-        recentHistory.forEach(msg => {
-          if (msg.role && msg.content) {
+          // 添加系统提示词
+          console.log('buildAPIMessages - currentRole:', this.currentRole);
+          if (this.currentRole && this.currentRole.systemPrompt) {
+            console.log('buildAPIMessages - systemPrompt:', this.currentRole.systemPrompt);
             messages.push({
-              role: msg.role === 'user' ? 'user' : 'assistant',
-              content: msg.content
+              role: 'system',
+              content: this.currentRole.systemPrompt
             });
           }
-        });
 
-        // 添加当前用户消息
-        messages.push({
-          role: 'user',
-          content: userMessage || '你好'
-        });
+          // 添加历史消息（最近10条）
+          const recentHistory = Array.isArray(this.chatHistory) ? this.chatHistory.slice(-10) : [];
+          recentHistory.forEach(msg => {
+            if (msg && msg.role && msg.content) {
+              messages.push({
+                role: msg.role === 'user' ? 'user' : 'assistant',
+                content: msg.content
+              });
+            }
+          });
 
-        return messages;
-      }
+          // 添加当前用户消息
+          messages.push({
+            role: 'user',
+            content: userMessage || '你好'
+          });
 
-      // 验证并修正AI回复中的角色名字
-      validateRoleName(response) {
-        if (!this.currentRole || !this.currentRole.name) {
-          return response;
+          console.log('buildAPIMessages - final messages count:', messages.length);
+          return messages;
+        } catch (error) {
+          console.error('Error in buildAPIMessages:', error);
+          // 返回最基本的用户消息
+          return [{
+            role: 'user',
+            content: userMessage || '你好'
+          }];
         }
-
-        const correctName = this.currentRole.name.trim();
-        const commonWrongNames = ['AI', '助手', '小助手', '智能助手', 'AI助手', '人工智能', '机器人'];
-
-        // 如果AI在回复中提到了错误的名字，替换为正确的名字
-        let correctedResponse = response;
-
-        // 检查是否包含"我是XXX"的句式
-        const selfIntroPattern = /我是([^，。！？\n]{1,10})([，。！？]|\n|$)/;
-        const match = response.match(selfIntroPattern);
-
-        if (match) {
-          const mentionedName = match[1].trim();
-          // 如果提到的名字不是当前角色名字，且是常见的错误名字
-          if (mentionedName !== correctName && commonWrongNames.some(wrongName => mentionedName.includes(wrongName))) {
-            // 替换为正确的角色名字
-            correctedResponse = response.replace(selfIntroPattern, `我是${correctName}$2`);
-            console.log(`角色名字修正: "${mentionedName}" -> "${correctName}"`);
-          }
-        }
-
-        return correctedResponse;
       }
 
       setupSettingsEvents() {
